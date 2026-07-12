@@ -451,11 +451,16 @@ class CaseStudyBlock(Flowable):
         self.canv.setLineWidth(1.5)
         self.canv.roundRect(0, 0, self.width, self.height, 6, fill=1, stroke=1)
 
-        # Company header
+        # Company header — adaptive font sizing for long names
         self.canv.setFillColor(_hex_to_rl_color(p.primary))
-        self.canv.setFont(t.heading_font, t.heading_size_h3)
         company = self.data.get("company", "Case Study")
-        self.canv.drawString(self.padding, self.height - 20, f"CASE STUDY: {company}")
+        full_title = f"CASE STUDY: {company}"
+        title_fs = t.heading_size_h3
+        max_title_w = self.width - self.padding * 2
+        while title_fs >= 7 and stringWidth(full_title, t.heading_font, title_fs) > max_title_w:
+            title_fs -= 1
+        self.canv.setFont(t.heading_font, title_fs)
+        self.canv.drawString(self.padding, self.height - 20, full_title)
 
         # Section labels + content — use SAME lines computed in wrap()
         y = self.height - 40
@@ -490,16 +495,16 @@ class SWOTMatrix(Flowable):
         Flowable.__init__(self)
         self.swot = swot_data
         self.theme = theme
-        self.padding = 10
-        self.cell_padding = 7
+        self.padding = 8
+        self.cell_padding = 5
 
     def wrap(self, availWidth, availHeight):
         self.width = availWidth
         self.cell_w = (availWidth - self.padding) / 2
         t = self.theme.typography
         item_font_size = t.body_size - 1.5
-        line_spacing = item_font_size * 1.25
-        text_width_per_cell = self.cell_w - self.cell_padding * 2 - 8
+        line_spacing = item_font_size * 1.2
+        text_width_per_cell = self.cell_w - self.cell_padding * 2 - 6
 
         self._quadrant_lines = {}
         max_cell_lines = 0
@@ -515,8 +520,8 @@ class SWOTMatrix(Flowable):
             max_cell_lines = max(max_cell_lines, len(all_lines))
 
         # Add 2 extra lines buffer for title bar
-        self._cell_inner_h = (max_cell_lines + 1) * line_spacing + self.cell_padding * 2 + 22
-        self.height = self._cell_inner_h * 2 + self.padding
+        self._cell_inner_h = (max_cell_lines + 0) * line_spacing + self.cell_padding * 2 + 18
+        self.height = self._cell_inner_h * 2 + self.padding + 2
         return (availWidth, self.height)
 
     def draw(self):

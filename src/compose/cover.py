@@ -84,20 +84,20 @@ class CoverPage(Flowable):
         fs, _ = self._fit_title(title, max_w)
         self.canv.setFillColor(colors.white)
         self.canv.setFont(t.heading_font, fs)
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.58, title)
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.56, title)
 
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             sfs, _ = self._fit_subtitle(subtitle, max_w)
             self.canv.setFont(t.body_font, sfs)
             self.canv.setFillColor(colors.Color(1, 1, 1, alpha=0.85))
-            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.50, subtitle)
+            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.47, subtitle)
 
         date = self.meta.get("date", "")
         author = self.meta.get("author", "H Heuristics Research")
         self.canv.setFont(t.body_font, 10)
         self.canv.setFillColor(colors.Color(1, 1, 1, alpha=0.6))
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.38,
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.36,
                                      f"{date}  |  {author}")
 
         brand = self.meta.get("brand", "H HEURISTICS")
@@ -132,19 +132,19 @@ class CoverPage(Flowable):
         fs, _ = self._fit_title(title, max_w, max_font=30)
         self.canv.setFillColor(_hex_to_rl_color(p.primary))
         self.canv.setFont(t.heading_font, fs)
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.58, title)
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.56, title)
 
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             sfs, _ = self._fit_subtitle(subtitle, max_w)
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
             self.canv.setFont(t.body_font, sfs)
-            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.50, subtitle)
+            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.47, subtitle)
 
         date = self.meta.get("date", "")
         self.canv.setFont(t.body_font, 10)
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.40,
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.38,
                                      f"{date}  |  {self.meta.get('author', 'H Heuristics Research')}")
 
         self.canv.setFont(t.heading_font, 11)
@@ -210,14 +210,14 @@ class CoverPage(Flowable):
         fs, _ = self._fit_title(title, max_w, max_font=30)
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
         self.canv.setFont(t.heading_font, fs)
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.55, title)
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.54, title)
 
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             sfs, _ = self._fit_subtitle(subtitle, max_w)
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
             self.canv.setFont(t.body_font, sfs)
-            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.48, subtitle)
+            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.46, subtitle)
 
         self.canv.setFont(t.body_font, 9)
         self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.28,
@@ -248,7 +248,7 @@ class CoverPage(Flowable):
         fs, _ = self._fit_title(title, max_w, max_font=28)
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
         self.canv.setFont(t.heading_font, fs)
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.55, title)
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.54, title)
 
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
@@ -302,14 +302,14 @@ class CoverPage(Flowable):
         fs, _ = self._fit_title(title, max_w, max_font=30)
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
         self.canv.setFont(t.heading_font, fs)
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.55, title)
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.54, title)
 
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             sfs, _ = self._fit_subtitle(subtitle, max_w)
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
             self.canv.setFont(t.body_font, sfs)
-            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.48, subtitle)
+            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.46, subtitle)
 
         self.canv.setFont(t.body_font, 10)
         self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.30,
@@ -352,18 +352,18 @@ class CoverPage(Flowable):
         fs, _ = self._fit_title(title, max_w, max_font=28)
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
         self.canv.setFont(t.heading_font, fs)
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.58, title)
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.56, title)
 
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             sfs, _ = self._fit_subtitle(subtitle, max_w)
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
             self.canv.setFont(t.body_font, sfs)
-            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.50, subtitle)
+            self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.47, subtitle)
 
         self.canv.setFont(t.body_font, 10)
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.38,
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.36,
                                      f"{self.meta.get('date', '')}  |  {self.meta.get('author', 'H Heuristics Research')}")
 
         self.canv.setFont(t.heading_font, 11)
@@ -437,7 +437,7 @@ class CoverPage(Flowable):
         fs, _ = self._fit_title(title, max_w)
         self.canv.setFillColor(colors.white)
         self.canv.setFont(t.heading_font, fs)
-        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.58, title)
+        self.canv.drawCentredString(self.page_w / 2, self.page_h * 0.56, title)
 
         subtitle = self.meta.get("subtitle", "")
         if subtitle:

@@ -303,14 +303,16 @@ class ReportBuilder:
             elements.append(Spacer(1, 10))
             elements.append(KPICards(kpi_items, self.theme, cols=min(len(kpi_items), 4)))
 
-        elements.append(PageBreak())
+        # NO trailing page break — next chapter's leading break handles it
         return elements
 
     # ── Chapter ────────────────────────────────────────────────────
 
     def _render_chapter(self, sec: dict) -> list:
-        """Render a chapter with title and content."""
+        """Render a chapter with title and content. Page break BEFORE heading."""
         elements = []
+        # Page break before each chapter ensures clean start without trailing blanks
+        elements.append(PageBreak())
         title = sec.get("title", "")
 
         if title:
@@ -334,8 +336,7 @@ class ReportBuilder:
             if sub_els:
                 elements.extend(sub_els)
 
-        # Page break after each chapter
-        elements.append(PageBreak())
+        # NO trailing page break — next chapter's leading PageBreak handles it
         return elements
 
     # ── Section / Subsection ───────────────────────────────────────
@@ -595,8 +596,9 @@ class ReportBuilder:
         return elements
 
     def _render_methodology(self, sec: dict) -> list:
-        """Render methodology section."""
+        """Render methodology section. Page break before heading."""
         elements = []
+        elements.append(PageBreak())
         title = sec.get("title", "Methodology & Data Sources")
         elements.append(Paragraph(title, heading_style(self.theme, 1)))
         elements.append(SectionDivider(self.theme))
@@ -609,7 +611,7 @@ class ReportBuilder:
                 if para:
                     elements.append(Paragraph(para.replace("\n", "<br/>"), body_style(self.theme)))
 
-        elements.append(PageBreak())
+        # NO trailing page break — next section's leading PageBreak handles it
         return elements
 
     def _render_timeline(self, sec: dict) -> list:

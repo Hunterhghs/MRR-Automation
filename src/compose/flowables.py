@@ -487,8 +487,8 @@ class SWOTMatrix(Flowable):
         self.cell_w = (availWidth - self.padding) / 2
         t = self.theme.typography
         item_font_size = t.body_size - 1.5
-        line_spacing = item_font_size * 1.45
-        text_width_per_cell = self.cell_w - self.cell_padding * 2 - 6
+        line_spacing = item_font_size * 1.5
+        text_width_per_cell = self.cell_w - self.cell_padding * 2 - 8
 
         self._quadrant_lines = {}
         max_cell_lines = 0
@@ -504,15 +504,15 @@ class SWOTMatrix(Flowable):
             max_cell_lines = max(max_cell_lines, len(all_lines))
 
         # Add 2 extra lines buffer for title bar
-        self._cell_inner_h = (max_cell_lines + 1) * line_spacing + self.cell_padding * 2 + 18
-        self.height = self._cell_inner_h * 2 + self.padding
+        self._cell_inner_h = (max_cell_lines + 1) * line_spacing + self.cell_padding * 2 + 26
+        self.height = self._cell_inner_h * 2 + self.padding + 2
         return (availWidth, self.height)
 
     def draw(self):
         p = self.theme.palette
         t = self.theme.typography
         item_font_size = t.body_size - 1.5
-        line_spacing = item_font_size * 1.45
+        line_spacing = item_font_size * 1.5
         cw = self.cell_w
         cp = self.cell_padding
         cell_h = self._cell_inner_h
@@ -533,19 +533,19 @@ class SWOTMatrix(Flowable):
             self.canv.rect(x, y, cw, h, fill=1, stroke=1)
 
             # Title bar
-            title_bar_h = 18
+            title_bar_h = 22
             self.canv.setFillColor(_hex_to_rl_color(accent_color))
             self.canv.rect(x, y + h - title_bar_h, cw, title_bar_h, fill=1, stroke=0)
             self.canv.setFillColor(colors.white)
-            self.canv.setFont(t.heading_font, 9)
-            self.canv.drawString(x + cp, y + h - title_bar_h + 4, title)
+            self.canv.setFont(t.heading_font, 10)
+            self.canv.drawString(x + cp, y + h - title_bar_h + 6, title)
 
             # Items — use SAME lines computed in wrap()
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
             self.canv.setFont(t.body_font, item_font_size)
-            item_y = y + h - title_bar_h - cp - 4
+            item_y = y + h - title_bar_h - cp - 8
             for line in lines:
-                self.canv.drawString(x + cp + 4, item_y, f"\u2022 {line}")
+                self.canv.drawString(x + cp + 6, item_y, f"\u2022 {line}")
                 item_y -= line_spacing
 
 
@@ -554,7 +554,11 @@ class SWOTMatrix(Flowable):
 def styled_table(headers: list[str], rows: list[list[str]],
                  theme: Theme, title: str = "",
                  col_widths: list[float] | None = None) -> list[Flowable]:
-    """Build a styled data table as a list of flowables."""
+    """Build a styled data table with text-wrapping Paragraph cells.
+
+    Unlike raw strings, Paragraph cells wrap text within column widths,
+    preventing cell overflow and text overlap between columns.
+    """
     p = theme.palette
     t = theme.typography
 
@@ -563,29 +567,52 @@ def styled_table(headers: list[str], rows: list[list[str]],
         elements.append(Paragraph(title, heading_style(theme, 3)))
         elements.append(Spacer(1, 4))
 
-    table_data = [headers] + rows
+    # Determine column widths if not provided
+    if col_widths is None:
+        n_cols = len(headers)
+        col_widths = [450.0 / n_cols] * n_cols  # default even split
+
+    # Cell paragraph styles
+    header_style = ParagraphStyle(
+        "TableHeader", fontName=t.body_font, fontSize=t.body_size - 1,
+        leading=(t.body_size - 1) * 1.3, textColor=colors.white,
+        alignment=TA_LEFT,
+    )
+    cell_style_left = ParagraphStyle(
+        "TableCellLeft", fontName=t.body_font, fontSize=t.body_size - 2,
+        leading=(t.body_size - 2) * 1.3, textColor=_hex_to_rl_color(p.neutral_dark),
+        alignment=TA_LEFT,
+    )
+    cell_style_right = ParagraphStyle(
+        "TableCellRight", fontName=t.body_font, fontSize=t.body_size - 2,
+        leading=(t.body_size - 2) * 1.3, textColor=_hex_to_rl_color(p.neutral_dark),
+        alignment=TA_RIGHT,
+    )
+
+    # Build table data with Paragraph-wrapped cells
+    header_row = [Paragraph(h, header_style) for h in headers]
+    data_rows = []
+    for row in rows:
+        para_row = []
+        for i, cell in enumerate(row):
+            style = cell_style_left if i == 0 else cell_style_right
+            para_row.append(Paragraph(str(cell), style))
+        data_rows.append(para_row)
+
+    table_data = [header_row] + data_rows
 
     header_color = _hex_to_rl_color(p.primary)
     row_even = _hex_to_rl_color(p.neutral_light)
-    text_color = _hex_to_rl_color(p.neutral_dark)
 
     tbl = Table(table_data, colWidths=col_widths, repeatRows=1)
     style_cmds = [
         ("BACKGROUND", (0, 0), (-1, 0), header_color),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), t.body_font),
-        ("FONTSIZE", (0, 0), (-1, 0), t.body_size - 1),
-        ("FONTNAME", (0, 1), (-1, -1), t.body_font),
-        ("FONTSIZE", (0, 1), (-1, -1), t.body_size - 1),
-        ("TEXTCOLOR", (0, 1), (-1, -1), text_color),
-        ("ALIGN", (0, 0), (-1, 0), "LEFT"),
-        ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
-        ("ALIGN", (0, 1), (0, -1), "LEFT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("GRID", (0, 0), (-1, -1), 0.5, _hex_to_rl_color(p.neutral_mid)),
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, row_even]),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
         ("LEFTPADDING", (0, 0), (-1, -1), 6),
         ("RIGHTPADDING", (0, 0), (-1, -1), 6),
     ]

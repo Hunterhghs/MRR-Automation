@@ -150,6 +150,7 @@ def heading_style(theme: Theme, level: int = 1) -> ParagraphStyle:
         fontSize=sz, leading=sz * 1.25,
         textColor=_hex_to_rl_color(color),
         spaceBefore=space_before, spaceAfter=space_after,
+        pageBreakAfter=None if level >= 2 else None,  # prevent orphaned h2/h3
     )
 
 

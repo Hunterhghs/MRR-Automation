@@ -301,7 +301,7 @@ class ReportBuilder:
         kpi_items = sec.get("kpi_items", [])
         if kpi_items:
             elements.append(Spacer(1, 10))
-            elements.append(KPICards(kpi_items, self.theme, cols=min(len(kpi_items), 4)))
+            elements.append(KeepTogether(KPICards(kpi_items, self.theme, cols=min(len(kpi_items), 4))))
 
         # NO trailing page break — next chapter's leading break handles it
         return elements
@@ -461,7 +461,7 @@ class ReportBuilder:
             ))
 
         elements.append(Spacer(1, 6))
-        return elements
+        return [KeepTogether(elements)]
 
     # ── Table ──────────────────────────────────────────────────────
 
@@ -477,7 +477,7 @@ class ReportBuilder:
 
         self.table_num += 1
         full_title = f"Table {self.table_num}: {table_title}" if table_title else ""
-        return styled_table(headers, rows, self.theme, title=full_title)
+        return [KeepTogether(styled_table(headers, rows, self.theme, title=full_title))]
 
     # ── Callout / Key Findings / KPI Cards ─────────────────────────
 
@@ -485,7 +485,7 @@ class ReportBuilder:
         text = sec.get("content", "")
         if not text:
             return []
-        return [CalloutBox(text, self.theme), Spacer(1, 6)]
+        return [KeepTogether(CalloutBox(text, self.theme)), Spacer(1, 6)]
 
     def _render_key_findings(self, sec: dict) -> list:
         content = sec.get("content", "")
@@ -494,14 +494,14 @@ class ReportBuilder:
         findings = [f.strip() for f in content.split("\n") if f.strip()]
         if not findings:
             findings = [content]
-        return [KeyFindingsBox(findings, self.theme), Spacer(1, 8)]
+        return [KeepTogether(KeyFindingsBox(findings, self.theme)), Spacer(1, 8)]
 
     def _render_kpi_cards(self, sec: dict) -> list:
         kpi_items = sec.get("kpi_items", [])
         if not kpi_items:
             return []
         cols = sec.get("columns", min(len(kpi_items), 4))
-        return [KPICards(kpi_items, self.theme, cols=cols), Spacer(1, 6)]
+        return [KeepTogether(KPICards(kpi_items, self.theme, cols=cols)), Spacer(1, 6)]
 
     # ── Case Study / SWOT ─────────────────────────────────────────
 
@@ -509,7 +509,7 @@ class ReportBuilder:
         data = sec.get("case_study_data", {})
         if not data:
             return []
-        return [CaseStudyBlock(data, self.theme), Spacer(1, 8)]
+        return [KeepTogether(CaseStudyBlock(data, self.theme)), Spacer(1, 8)]
 
     def _render_swot(self, sec: dict) -> list:
         swot = sec.get("swot_data", {})
@@ -520,9 +520,7 @@ class ReportBuilder:
         if title:
             elements.append(Paragraph(title, heading_style(self.theme, 2)))
             elements.append(Spacer(1, 4))
-        elements.append(SWOTMatrix(swot, self.theme))
-        elements.append(Spacer(1, 8))
-        return elements
+        return [KeepTogether(SWOTMatrix(swot, self.theme)), Spacer(1, 8)]
 
     # ── Special report sections ────────────────────────────────────
 

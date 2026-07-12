@@ -3,11 +3,26 @@
 This overrides the algorithmic theme generation when the brand flag is set.
 Colors match H Heuristics visual identity: professional, authoritative,
 with a warm academic feel suitable for market research.
+
+Each report gets a UNIQUE cover design via seed-based archetype selection
+while maintaining the consistent H Heuristics color palette and typography.
 """
+
+import random
 
 from .palette import Palette
 from .typography import Typography
-from .theme import Theme, Layout
+from .theme import Theme, Layout, COVER_ARCHETYPES
+
+# Brand-appropriate cover archetypes (professional, not experimental)
+# Excludes: geometric (too playful for market research)
+BRAND_COVER_ARCHETYPES = [
+    "full_bleed",
+    "split_horizontal",
+    "framed",
+    "minimal_center",
+    "banded",
+]
 
 # H Heuristics Brand Palette
 # Primary: Deep navy-blue — authority, trust, intelligence
@@ -74,30 +89,61 @@ BRAND_LAYOUT = Layout(
     columns=1,
 )
 
-H_HEURISTICS_THEME = Theme(
-    name="H Heuristics Brand",
-    seed=42,
-    palette=BRAND_PALETTE,
-    typography=BRAND_TYPOGRAPHY,
-    layout=BRAND_LAYOUT,
-    cover_archetype="framed",
-    decorative_density="moderate",
-)
+def generate_brand_theme(seed: int | None = None) -> Theme:
+    """Generate an H Heuristics brand theme with a unique cover design.
+
+    The palette, typography, and layout are fixed to H Heuristics identity.
+    The cover archetype is selected deterministically from the seed,
+    ensuring each report has a unique visual identity while maintaining
+    brand consistency.
+
+    Args:
+        seed: Integer seed for reproducible cover selection. Random if None.
+
+    Returns:
+        A branded Theme with a unique cover archetype.
+    """
+    if seed is None:
+        seed = random.randint(0, 2**31 - 1)
+
+    rng = random.Random(seed)
+    archetype = rng.choice(BRAND_COVER_ARCHETYPES)
+    density = rng.choice(["minimal", "moderate", "moderate", "rich"])
+
+    return Theme(
+        name=f"H Heuristics Brand (seed={seed})",
+        seed=seed,
+        palette=BRAND_PALETTE,
+        typography=BRAND_TYPOGRAPHY,
+        layout=BRAND_LAYOUT,
+        cover_archetype=archetype,
+        decorative_density=density,
+    )
 
 
-def apply_brand(theme: Theme | None = None) -> Theme:
+# Default instance for backwards compatibility (seed 42 = framed)
+H_HEURISTICS_THEME = generate_brand_theme(seed=42)
+
+
+def apply_brand(theme: Theme | None = None, seed: int | None = None) -> Theme:
     """Return the H Heuristics brand theme, optionally merging with another.
 
     Args:
         theme: Optional theme to merge layout params from.
+        seed: Optional seed for unique cover selection. If not provided,
+              uses theme.seed if theme is given, else random.
 
     Returns:
-        Brand theme with palette and typography fixed to H Heuristics identity.
+        Brand theme with palette and typography fixed to H Heuristics identity
+        and a unique cover design based on the seed.
     """
-    if theme is None:
-        return H_HEURISTICS_THEME
+    if seed is None and theme is not None:
+        seed = theme.seed
 
-    # Keep the brand identity but allow different layouts/cover styles
+    if theme is None:
+        return generate_brand_theme(seed=seed)
+
+    # Keep the brand identity but preserve the cover archetype from theme
     return Theme(
         name=f"H Heuristics × {theme.name}",
         seed=theme.seed,

@@ -22,7 +22,6 @@ from reportlab.platypus.frames import Frame
 from reportlab.platypus.flowables import HRFlowable
 
 from ..design.theme import Theme
-from ..design.brand import H_HEURISTICS_THEME
 from ..data.world_bank import WorldBankAPI
 from ..charts.engine import (
     line_chart, bar_chart, grouped_bar_chart, stacked_area_chart,
@@ -47,13 +46,26 @@ class ReportBuilder:
 
         # Apply brand if requested
         if use_brand:
+            from ..design.brand import apply_brand, generate_brand_theme
             if theme:
-                from ..design.brand import apply_brand
                 self.theme = apply_brand(theme)
             else:
-                self.theme = H_HEURISTICS_THEME
+                # Generate a unique brand theme from the spec seed
+                seed = self.meta.get("seed")
+                if seed is None:
+                    import random
+                    seed = random.randint(0, 2**31 - 1)
+                self.theme = generate_brand_theme(seed=seed)
         else:
-            self.theme = theme or H_HEURISTICS_THEME
+            from ..design.brand import generate_brand_theme
+            if theme:
+                self.theme = theme
+            else:
+                seed = self.meta.get("seed")
+                if seed is None:
+                    import random
+                    seed = random.randint(0, 2**31 - 1)
+                self.theme = generate_brand_theme(seed=seed)
 
         self.wb = WorldBankAPI()
         self.story: list = []  # The flowable sequence

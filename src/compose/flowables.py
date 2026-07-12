@@ -236,18 +236,28 @@ class KPICards(Flowable):
             self.canv.setFillColor(_hex_to_rl_color(trend_color))
             self.canv.roundRect(x + 2, y + self.card_height - 4, self.card_w - 4, 4, 2, fill=1, stroke=0)
 
-            # Label — truncate if too wide for card
+            # Label — wrap to 2 lines if needed, truncate as last resort
             label = item.get("label", "").upper()
             label_font_size = 7
             max_label_w = self.card_w - self.card_padding * 2
             self.canv.setFont(t.body_font, label_font_size)
-            if stringWidth(label, t.body_font, label_font_size) > max_label_w:
-                # Truncate with ellipsis
-                while label and stringWidth(label + "...", t.body_font, label_font_size) > max_label_w:
-                    label = label[:-1]
-                label += "..."
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
-            self.canv.drawString(x + self.card_padding, y + self.card_height - 18, label)
+            if stringWidth(label, t.body_font, label_font_size) <= max_label_w:
+                self.canv.drawString(x + self.card_padding, y + self.card_height - 18, label)
+            else:
+                # Try wrapping to 2 lines
+                label_lines = _wrap_text_to_lines(label, max_label_w, t.body_font, label_font_size)
+                if len(label_lines) <= 2:
+                    for li, ll in enumerate(label_lines):
+                        ly = y + self.card_height - 18 - li * (label_font_size + 1)
+                        self.canv.drawString(x + self.card_padding, ly, ll)
+                else:
+                    # Still too long — truncate line 2 with ellipsis
+                    self.canv.drawString(x + self.card_padding, y + self.card_height - 18, label_lines[0])
+                    trunc = label_lines[1]
+                    while trunc and stringWidth(trunc + "...", t.body_font, label_font_size) > max_label_w:
+                        trunc = trunc[:-1]
+                    self.canv.drawString(x + self.card_padding, y + self.card_height - 18 - (label_font_size + 1), trunc + "...")
 
             # Value
             value_text = item.get("value", "")
@@ -486,8 +496,8 @@ class SWOTMatrix(Flowable):
         self.width = availWidth
         self.cell_w = (availWidth - self.padding) / 2
         t = self.theme.typography
-        item_font_size = t.body_size - 2.5
-        line_spacing = item_font_size * 1.35
+        item_font_size = t.body_size - 1.5
+        line_spacing = item_font_size * 1.25
         text_width_per_cell = self.cell_w - self.cell_padding * 2 - 8
 
         self._quadrant_lines = {}
@@ -511,8 +521,8 @@ class SWOTMatrix(Flowable):
     def draw(self):
         p = self.theme.palette
         t = self.theme.typography
-        item_font_size = t.body_size - 2.5
-        line_spacing = item_font_size * 1.35
+        item_font_size = t.body_size - 1.5
+        line_spacing = item_font_size * 1.25
         cw = self.cell_w
         cp = self.cell_padding
         cell_h = self._cell_inner_h
@@ -567,10 +577,26 @@ def styled_table(headers: list[str], rows: list[list[str]],
         elements.append(Paragraph(title, heading_style(theme, 3)))
         elements.append(Spacer(1, 4))
 
-    # Determine column widths if not provided
+    # Determine column widths if not provided — smart allocation
     if col_widths is None:
         n_cols = len(headers)
-        col_widths = [450.0 / n_cols] * n_cols  # default even split
+        # Use actual frame width (~464pt for A4 with 22mm margins)
+        total_w = 460.0
+        if n_cols <= 3:
+            # For few columns: give extra width to first (label) column
+            first_w = total_w * 0.40
+            rest_w = (total_w - first_w) / (n_cols - 1) if n_cols > 1 else 0
+            col_widths = [first_w] + [rest_w] * (n_cols - 1)
+        elif n_cols <= 5:
+            # For 4-5 columns: proportional allocation
+            first_w = total_w * 0.30
+            rest_w = (total_w - first_w) / (n_cols - 1)
+            col_widths = [first_w] + [rest_w] * (n_cols - 1)
+        else:
+            # For 6+ columns: more even, but first column gets extra
+            first_w = total_w * 0.22
+            rest_w = (total_w - first_w) / (n_cols - 1)
+            col_widths = [first_w] + [rest_w] * (n_cols - 1)
 
     # Cell paragraph styles
     header_style = ParagraphStyle(

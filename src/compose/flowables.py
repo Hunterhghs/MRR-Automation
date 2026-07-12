@@ -451,19 +451,39 @@ class CaseStudyBlock(Flowable):
         self.canv.setLineWidth(1.5)
         self.canv.roundRect(0, 0, self.width, self.height, 6, fill=1, stroke=1)
 
-        # Company header — adaptive font sizing for long names
+        # Company header — wrap to 2 lines instead of shrinking font
         self.canv.setFillColor(_hex_to_rl_color(p.primary))
         company = self.data.get("company", "Case Study")
         full_title = f"CASE STUDY: {company}"
         title_fs = t.heading_size_h3
         max_title_w = self.width - self.padding * 2
-        while title_fs >= 7 and stringWidth(full_title, t.heading_font, title_fs) > max_title_w:
-            title_fs -= 1
-        self.canv.setFont(t.heading_font, title_fs)
-        self.canv.drawString(self.padding, self.height - 20, full_title)
+        # Try 1 line at heading_size_h3, then 2 lines if needed
+        if stringWidth(full_title, t.heading_font, title_fs) <= max_title_w:
+            self.canv.setFont(t.heading_font, title_fs)
+            self.canv.drawString(self.padding, self.height - 20, full_title)
+        else:
+            lines = _wrap_text_to_lines(full_title, max_title_w, t.heading_font, title_fs)
+            if len(lines) <= 2:
+                line_h = title_fs * 1.3
+                for i, line in enumerate(lines):
+                    self.canv.setFont(t.heading_font, title_fs)
+                    self.canv.drawString(self.padding, self.height - 20 - i * line_h, line)
+            else:
+                # Still too long — shrink slightly
+                title_fs = t.heading_size_h3 - 1
+                while title_fs >= 7:
+                    lines = _wrap_text_to_lines(full_title, max_title_w, t.heading_font, title_fs)
+                    if len(lines) <= 2:
+                        break
+                    title_fs -= 1
+                line_h = title_fs * 1.3
+                for i, line in enumerate(lines[:2]):
+                    self.canv.setFont(t.heading_font, title_fs)
+                    self.canv.drawString(self.padding, self.height - 20 - i * line_h, line)
 
-        # Section labels + content — use SAME lines computed in wrap()
-        y = self.height - 40
+        # Section labels + content — adjust for possible 2-line title
+        title_lines = len(_wrap_text_to_lines(full_title, max_title_w, t.heading_font, t.heading_size_h3))
+        y = self.height - 40 - max(0, (title_lines - 1) * (t.heading_size_h3 * 1.3))
         sections = [
             ("challenge", "Challenge:"),
             ("solution", "Solution:"),

@@ -486,8 +486,8 @@ class SWOTMatrix(Flowable):
         self.width = availWidth
         self.cell_w = (availWidth - self.padding) / 2
         t = self.theme.typography
-        item_font_size = t.body_size - 1.5
-        line_spacing = item_font_size * 1.5
+        item_font_size = t.body_size - 2.5
+        line_spacing = item_font_size * 1.35
         text_width_per_cell = self.cell_w - self.cell_padding * 2 - 8
 
         self._quadrant_lines = {}
@@ -504,15 +504,15 @@ class SWOTMatrix(Flowable):
             max_cell_lines = max(max_cell_lines, len(all_lines))
 
         # Add 2 extra lines buffer for title bar
-        self._cell_inner_h = (max_cell_lines + 1) * line_spacing + self.cell_padding * 2 + 26
-        self.height = self._cell_inner_h * 2 + self.padding + 2
+        self._cell_inner_h = (max_cell_lines + 1) * line_spacing + self.cell_padding * 2 + 22
+        self.height = self._cell_inner_h * 2 + self.padding
         return (availWidth, self.height)
 
     def draw(self):
         p = self.theme.palette
         t = self.theme.typography
-        item_font_size = t.body_size - 1.5
-        line_spacing = item_font_size * 1.5
+        item_font_size = t.body_size - 2.5
+        line_spacing = item_font_size * 1.35
         cw = self.cell_w
         cp = self.cell_padding
         cell_h = self._cell_inner_h

@@ -14,14 +14,18 @@ from .palette import Palette
 from .typography import Typography
 from .theme import Theme, Layout, COVER_ARCHETYPES
 
-# Brand-appropriate cover archetypes (professional, not experimental)
-# Excludes: geometric (too playful for market research)
+# Brand-appropriate cover archetypes — 10 distinct professional designs
 BRAND_COVER_ARCHETYPES = [
     "full_bleed",
     "split_horizontal",
     "framed",
     "minimal_center",
     "banded",
+    "corner_bracket",
+    "sidebar",
+    "gradient_overlay",
+    "window",
+    "vertical_split",
 ]
 
 # H Heuristics Brand Palette

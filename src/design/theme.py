@@ -14,6 +14,11 @@ COVER_ARCHETYPES = [
     "minimal_center",
     "banded",
     "geometric",
+    "corner_bracket",
+    "sidebar",
+    "gradient_overlay",
+    "window",
+    "vertical_split",
 ]
 
 

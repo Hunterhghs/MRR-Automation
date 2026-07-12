@@ -42,7 +42,7 @@ class CoverPage(Flowable):
                     self.canv.drawCentredString(cx, top_y, title)
                 else:
                     self.canv.drawString(cx, top_y, title)
-                return font_size
+                return (font_size, 1)
 
         # Wrap to 2-3 lines
         for font_size in [max_font - 2, max_font - 4, max_font - 6]:
@@ -56,13 +56,14 @@ class CoverPage(Flowable):
                         self.canv.drawCentredString(cx, y, line)
                     else:
                         self.canv.drawString(cx, y, line)
-                return font_size
+                return (font_size, len(lines))
         # Fallback
         self.canv.setFont(t.heading_font, max_font - 6)
         if centered:
             self.canv.drawCentredString(cx, top_y, title[:80])
         else:
             self.canv.drawString(cx, top_y, title[:80])
+        return (max_font - 6, 1)
 
     def _draw_subtitle_multiline(self, subtitle: str, cx: float, top_y: float,
                                   max_width: float, max_font: int = 14,
@@ -125,11 +126,11 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = self.page_w * 0.85
         self.canv.setFillColor(colors.white)
-        used_fs = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.59, max_w, 32)
+        used_fs, n_title_lines = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.59, max_w, 32)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(colors.Color(1, 1, 1, alpha=0.85))
-            sub_y = self.page_h * 0.59 - (used_fs * 1.35) - 20
+            sub_y = self.page_h * 0.59 - (n_title_lines * used_fs * 1.35) - 24
             self._draw_subtitle_multiline(subtitle, self.page_w / 2, sub_y, max_w, 14)
 
         date = self.meta.get("date", "")
@@ -169,11 +170,11 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = self.page_w - 2 * inner_margin - 40
         self.canv.setFillColor(_hex_to_rl_color(p.primary))
-        used_fs = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.59, max_w, 30)
+        used_fs, n_title_lines = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.59, max_w, 30)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
-            sub_y = self.page_h * 0.59 - (used_fs * 1.35) - 20
+            sub_y = self.page_h * 0.59 - (n_title_lines * used_fs * 1.35) - 24
             self._draw_subtitle_multiline(subtitle, self.page_w / 2, sub_y, max_w, 13)
 
         date = self.meta.get("date", "")
@@ -202,7 +203,7 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = self.page_w * 0.85
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
-        used_fs = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.32, max_w, 28)
+        used_fs, n_title_lines = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.32, max_w, 28)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
@@ -239,7 +240,7 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = self.page_w * 0.80
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
-        used_fs = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.57, max_w, 30)
+        used_fs, n_title_lines = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.57, max_w, 30)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
@@ -327,7 +328,7 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = self.page_w * 0.80
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
-        used_fs = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.57, max_w, 30)
+        used_fs, n_title_lines = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.57, max_w, 30)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
@@ -373,11 +374,11 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = self.page_w - 2 * margin - 40
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
-        used_fs = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.59, max_w, 28)
+        used_fs, n_title_lines = self._draw_title_multiline(title, self.page_w / 2, self.page_h * 0.59, max_w, 28)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
-            sub_y = self.page_h * 0.59 - (used_fs * 1.35) - 20
+            sub_y = self.page_h * 0.59 - (n_title_lines * used_fs * 1.35) - 24
             self._draw_subtitle_multiline(subtitle, self.page_w / 2, sub_y, max_w, 13)
 
         self.canv.setFont(t.body_font, 10)
@@ -415,11 +416,11 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = self.page_w - content_x - 40
         self.canv.setFillColor(_hex_to_rl_color(p.neutral_dark))
-        used_fs = self._draw_title_multiline(title, content_x, self.page_h * 0.59, max_w, 26, centered=False)
+        used_fs, n_title_lines = self._draw_title_multiline(title, content_x, self.page_h * 0.59, max_w, 26, centered=False)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(_hex_to_rl_color(p.neutral_mid))
-            sub_y = self.page_h * 0.59 - (used_fs * 1.35) - 20
+            sub_y = self.page_h * 0.59 - (n_title_lines * used_fs * 1.35) - 24
             self._draw_subtitle_multiline(subtitle, content_x, sub_y, max_w, 13, centered=False)
 
         self.canv.setFont(t.body_font, 9)
@@ -494,11 +495,11 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = win_w - 60
         self.canv.setFillColor(colors.white)
-        used_fs = self._draw_title_multiline(title, self.page_w / 2, win_y + win_h * 0.65, max_w, 26)
+        used_fs, n_title_lines = self._draw_title_multiline(title, self.page_w / 2, win_y + win_h * 0.65, max_w, 26)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(colors.Color(1, 1, 1, alpha=0.80))
-            sub_y = win_y + win_h * 0.65 - (used_fs * 1.35) - 20
+            sub_y = win_y + win_h * 0.65 - (n_title_lines * used_fs * 1.35) - 24
             self._draw_subtitle_multiline(subtitle, self.page_w / 2, sub_y, max_w, 13)
 
         self.canv.setFont(t.body_font, 10)
@@ -530,11 +531,11 @@ class CoverPage(Flowable):
         title = self.meta.get("title", "Report Title")
         max_w = split_x - 50
         self.canv.setFillColor(colors.white)
-        used_fs = self._draw_title_multiline(title, 35, self.page_h * 0.59, max_w, 26, centered=False)
+        used_fs, n_title_lines = self._draw_title_multiline(title, 35, self.page_h * 0.59, max_w, 26, centered=False)
         subtitle = self.meta.get("subtitle", "")
         if subtitle:
             self.canv.setFillColor(colors.Color(1, 1, 1, alpha=0.80))
-            sub_y = self.page_h * 0.59 - (used_fs * 1.35) - 20
+            sub_y = self.page_h * 0.59 - (n_title_lines * used_fs * 1.35) - 24
             self._draw_subtitle_multiline(subtitle, 35, sub_y, max_w, 13, centered=False)
 
         self.canv.setFont(t.body_font, 10)

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mrr-automation"
+version = "1.0.0"
+description = "H Heuristics Market Research Report Generator — professional 20-60 page PDF reports"
+requires-python = ">=3.9"
+dependencies = [
+    "reportlab>=4.2",
+    "requests>=2.31",
+    "pandas>=2.2",
+    "numpy>=2.0",
+    "matplotlib>=3.9",
+    "pyyaml>=6.0",
+    "jsonschema>=4.23",
+    "rich>=13.0",
+    "click>=8.1",
+    "scipy>=1.10",
+]
+
+[project.scripts]
+mrr-automation = "src.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
